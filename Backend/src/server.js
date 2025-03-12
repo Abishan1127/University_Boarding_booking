@@ -6,9 +6,13 @@ const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 
 const bodyParser = require("body-parser");
+
 const bookingRoutes = require("./controllers/bookingController");
-
-
+const paymentRoutes = require("./routes/paymentRoutes");
+const userRoutes = require("./routes/userRoutes");
+const boardingRoutes = require("./routes/boardingRoutes");
+const roomRoutes = require("./routes/roomRoutes");
+const universityRoutes = require("./routes/universityRoutes");
 
 dotenv.config();
 
@@ -25,27 +29,15 @@ app.use(express.json());
 app.use(cookieParser()); 
 app.use(bodyParser.json());
 
-app.use("/api/bookings", bookingRoutes);
-
 // Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
 app.use("/api/bookings", bookingRoutes);
-
-// Import Routes
-const userRoutes = require("./routes/userRoutes");
-const boardingRoutes = require("./routes/boardingRoutes");
-const roomRoutes = require("./routes/roomRoutes");
-const universityRoutes = require("./routes/universityRoutes");
-
-// Use Routes
 app.use("/api/boarding", boardingRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/universities", universityRoutes);
 app.use("/api/users", userRoutes);
-
-
+app.use("/api/payments", paymentRoutes);
 
 app.post("/send-email", async (req, res) => {
   const { name, email, title, message } = req.body;
@@ -77,9 +69,6 @@ app.post("/send-email", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to send email" });
   }
 });
-
-
-
 
 // Start Server
 const PORT = process.env.PORT || 5000;

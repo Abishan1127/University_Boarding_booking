@@ -4,6 +4,7 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Roombooking.css";
+import CheckoutPage from "../../Checkout";
 
 // Define interfaces for boarding and room
 interface Boarding {
@@ -140,7 +141,7 @@ const Roombooking = () => {
                                 setErrorMessage(null);
                             }}
                             dateFormat="yyyy-MM-dd"
-                            minDate={startDate ? new Date(startDate.getTime() + (30 * 24 * 60 * 60 * 1000)*6) : undefined}
+                            minDate={startDate ? new Date(startDate.getTime() + (30 * 24 * 60 * 60 * 1000) * 6) : undefined}
                             disabled={!startDate}
                         />
                     </div>
@@ -161,7 +162,7 @@ const Roombooking = () => {
                                 className={`boarding-item ${selectedBoarding?.board_id === boarding.board_id ? "selected" : ""}`}
                                 onClick={() => handleSelectBoarding(boarding)}
                             >
-                                <img src={`http://localhost:5000${boarding.board_image}`} alt={boarding.board_name} className="boarding-image"/>
+                                <img src={`http://localhost:5000${boarding.board_image}`} alt={boarding.board_name} className="boarding-image" />
                                 <h4>{boarding.board_name}</h4>
                             </div>
                         ))}
@@ -194,23 +195,31 @@ const Roombooking = () => {
             )}
 
             {currentStep === 4 && (
-             <div className="confirm-booking">
-             <h3>Confirm Your Booking</h3>
-             <p><strong>University:</strong> {uni_name}</p>
-             <p><strong>Boarding:</strong> {selectedBoarding?.board_name}</p>
-             <p><strong>Room:</strong> {selectedRoom?.room_id}</p>
-             <p><strong>Start Date:</strong> {startDate?.toLocaleDateString()}</p>
-             <p><strong>End Date:</strong> {endDate?.toLocaleDateString()}</p>
-     
-             <div className="button-group">
-                 <button className="back-button" onClick={goBackToPreviousStep}>Back</button>
-                 <button className="confirm-button" onClick={handleConfirmBooking}>Confirm Booking</button>
-             </div>
-         </div>
-     )}
-     </div>
+                <div className="confirm-booking">
+                    <h3>Confirm Your Booking</h3>
+                    <p><strong>University:</strong> {uni_name}</p>
+                    <p><strong>Boarding:</strong> {selectedBoarding?.board_name}</p>
+                    <p><strong>Room:</strong> {selectedRoom?.room_id}</p>
+                    <p><strong>Start Date:</strong> {startDate?.toLocaleDateString()}</p>
+                    <p><strong>End Date:</strong> {endDate?.toLocaleDateString()}</p>
+
+                    <div className="button-group">
+                        <button className="back-button" onClick={goBackToPreviousStep}>Back</button>
+                        <button className="confirm-button" onClick={handleConfirmBooking}>Confirm Booking</button>
+                    </div>
+
+                    <CheckoutPage
+                        userId={1}
+                        startDate={startDate instanceof Date ? startDate : undefined}
+                        endDate={endDate instanceof Date ? endDate : undefined}
+                        boardingId={selectedBoarding?.board_id}
+                        roomId={selectedRoom?.room_id}
+                    />
+                </div>
+            )}
+        </div>
     );
-    
+
 };
 
 export default Roombooking;
