@@ -1,27 +1,34 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/Event.css";  
 
 interface Booking {
+  [x: string]: ReactNode;
   id: number;
-  username: string;
-  telephone_number: string;
-  service_name: string;
-  category_name: string;
-  event_date: string;
+  booking_id: number;
+  user_Id: number;
+  board_Id: number;
+  room_Id: number;
+  start_date: string;
+  end_date: string;
+  payment_status: string;
+  payment_method	: string;
+  transaction_id	: string;
+  amount: number;
+  createdAt: string;
 }
 
 const Book: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState<boolean>(false);
-  const [itemToDelete, setItemToDelete] = useState<{ id: number } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
-  // Get bookings
+  // Fetch bookings from the API
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/book")
       .then((response) => {
-        // bookings order
+        // Sorting bookings by ID
         const sortedBookings = response.data.sort((a: Booking, b: Booking) => a.id - b.id);
         setBookings(sortedBookings);
       })
@@ -30,26 +37,27 @@ const Book: React.FC = () => {
 
   // Delete a booking
   const deleteBooking = async () => {
-    if (itemToDelete) {
+    if (itemToDelete !== null) {
       try {
-        await axios.delete(`http://localhost:5000/api/bookdelete/${itemToDelete.id}`);
-        setBookings((prevBookings) => prevBookings.filter((booking) => booking.id !== itemToDelete.id));
+        await axios.delete(`http://localhost:5000/api/bookdelete/${itemToDelete}`);
+        setBookings((prevBookings) => prevBookings.filter((booking) => booking.id !== itemToDelete));
         setShowConfirmDelete(false);
         setItemToDelete(null);
         alert("Booking deleted successfully");
       } catch (error) {
         console.error("Error deleting booking:", error);
         alert("Error deleting booking");
-        setShowConfirmDelete(false);
       }
     }
   };
 
+  // Request confirmation before deleting
   const requestDelete = (id: number) => {
-    setItemToDelete({ id });
+    setItemToDelete(id);
     setShowConfirmDelete(true);
   };
 
+  // Cancel delete action
   const handleCancelDelete = () => {
     setShowConfirmDelete(false);
     setItemToDelete(null);
@@ -61,24 +69,34 @@ const Book: React.FC = () => {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Telephone</th>
-            <th>Service Name</th>
-            <th>Category Name</th>
-            <th>Event Date</th>
-            <th>Action</th>
+            <th>Book-ID</th>
+            <th>User-Id</th>
+            <th>Board-Id</th>
+            <th>Room-Id</th>
+            <th>Start-Date</th>
+            <th>End-Date</th>
+            <th>Status</th>
+            <th>Method</th>
+            <th>Transaction-ID</th>
+            <th>Amount</th>
+            <th>Created At</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {bookings.map((booking) => (
             <tr key={booking.id}>
-              <td>{booking.id}</td>
-              <td>{booking.username}</td>
-              <td>{booking.telephone_number}</td>
-              <td>{booking.service_name}</td>
-              <td>{booking.category_name}</td>
-              <td>{booking.event_date}</td>
+              <td>{booking.booking_id}</td>
+              <td>{booking.user_id}</td>
+              <td>{booking.board_id}</td>
+              <td>{booking.room_id}</td>
+              <td>{booking.start_date	}</td>
+              <td>{booking.end_date}</td>
+              <td>{booking.payment_status}</td>
+              <td>{booking.payment_method	}</td>
+              <td>{booking.transaction_id	}</td>
+              <td>{booking.amount}</td>
+              <td>{booking.created_at	}</td>
               <td>
                 <button className="delete-button" onClick={() => requestDelete(booking.id)}>
                   Delete
@@ -89,7 +107,7 @@ const Book: React.FC = () => {
         </tbody>
       </table>
 
-  
+      {/* Delete Confirmation Modal */}
       {showConfirmDelete && (
         <div className="modal-overlay">
           <div className="modal">

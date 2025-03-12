@@ -75,4 +75,24 @@
     background: red;
     color: white;
   }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   
+  /* Add Boarding Button */
+  .add-boarding-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-right: 200px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .add-boarding-button:hover {
+    background-color: #218838;
+  }

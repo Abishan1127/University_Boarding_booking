@@ -7,12 +7,12 @@ const nodemailer = require("nodemailer");
 
 const bodyParser = require("body-parser");
 
-const bookingRoutes = require("./controllers/bookingController");
 const paymentRoutes = require("./routes/paymentRoutes");
 const userRoutes = require("./routes/userRoutes");
 const boardingRoutes = require("./routes/boardingRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const universityRoutes = require("./routes/universityRoutes");
+const bookingRoutes = require("./routes/bookingRoutes")
 
 dotenv.config();
 
@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 // Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/api/bookings", bookingRoutes);
+app.use("/api/book", bookingRoutes);
 app.use("/api/boarding", boardingRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/universities", universityRoutes);

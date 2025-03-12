@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -18,12 +18,12 @@ interface Room {
     room_id: number;
     board_id: number;
     room_image: string;
+    room_price: number;
 }
 
 // Component
 const Roombooking = () => {
     const { state } = useLocation();
-    const navigate = useNavigate(); // React Router navigation
     const uni_id = state?.uni_id || null;
     const uni_name = state?.uni_name || "Selected University";
 
@@ -35,6 +35,8 @@ const Roombooking = () => {
     const [selectedBoarding, setSelectedBoarding] = useState<Boarding | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const token = localStorage.getItem("authToken");
 
     // Fetch boardings related to the selected university
     useEffect(() => {
@@ -79,32 +81,7 @@ const Roombooking = () => {
         setCurrentStep(4); // Move to confirmation step after selecting a room
     };
 
-    const handleConfirmBooking = async () => {
-        if (!selectedBoarding || !selectedRoom || !startDate || !endDate) {
-            alert("Please complete all booking steps.");
-            return;
-        }
-
-        try {
-            const response = await axios.post("http://localhost:5000/api/bookings", {
-                user_id: 1, // Replace with authenticated user ID
-                board_id: selectedBoarding.board_id,
-                room_id: selectedRoom.room_id,
-                start_date: startDate,
-                end_date: endDate,
-                payment_status: "Pending",
-            });
-
-            alert("Booking confirmed successfully!");
-
-            // Navigate to the Booking.tsx page after booking confirmation
-            navigate("/booking", { state: { bookingId: response.data.bookingId } });
-        } catch (error) {
-            console.error("Booking error:", error);
-            alert("Booking failed. Try again.");
-        }
-    };
-
+  
     return (
         <div className="container">
             <h2 className="title">Room Booking for {uni_name}</h2>
@@ -148,7 +125,9 @@ const Roombooking = () => {
 
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-                    <button className="next-button" onClick={goToNextStep}>Next</button>
+                    {
+                        !token ? <p className="please">Please Login</p> : <button className="next-button" onClick={goToNextStep}>Next</button>
+                    }
                 </div>
             )}
 
@@ -202,10 +181,9 @@ const Roombooking = () => {
                     <p><strong>Room:</strong> {selectedRoom?.room_id}</p>
                     <p><strong>Start Date:</strong> {startDate?.toLocaleDateString()}</p>
                     <p><strong>End Date:</strong> {endDate?.toLocaleDateString()}</p>
-
+                    <p><strong>Price:</strong> {selectedRoom?.room_price}</p>
                     <div className="button-group">
                         <button className="back-button" onClick={goBackToPreviousStep}>Back</button>
-                        <button className="confirm-button" onClick={handleConfirmBooking}>Confirm Booking</button>
                     </div>
 
                     <CheckoutPage
@@ -214,6 +192,7 @@ const Roombooking = () => {
                         endDate={endDate instanceof Date ? endDate : undefined}
                         boardingId={selectedBoarding?.board_id}
                         roomId={selectedRoom?.room_id}
+                        roomPrice={selectedRoom?.room_price}
                     />
                 </div>
             )}

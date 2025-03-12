@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/University.css";
 
@@ -8,7 +9,7 @@ interface University {
   uni_id: number;
   uni_name: string;
   uni_Address: string;
-  uni_contactnumber: string;
+  uni_contact_number: string;
   uni_image: string;
 }
 
@@ -16,6 +17,7 @@ const University: React.FC = () => {
   const [universities, setUniversities] = useState<University[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [universityIdToDelete, setUniversityIdToDelete] = useState<number | null>(null);
+  const navigate = useNavigate(); // For navigation
 
   useEffect(() => {
     axios
@@ -48,7 +50,13 @@ const University: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>University List</h2>
+      <div className="header">
+        <h2>University List</h2>
+        <button className="add-university-button" onClick={() => navigate("/adduniversity")}>
+          + Add University
+        </button>
+      </div>
+
       <table>
         <thead>
           <tr>

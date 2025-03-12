@@ -123,3 +123,31 @@
 .modal-button.confirm:hover {
   background-color: #388e3c;
 }
+/* Container */
+/* .content {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+} */
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add Room Button */
+.add-room-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.add-room-button:hover {
+  background-color: #218838;
+}

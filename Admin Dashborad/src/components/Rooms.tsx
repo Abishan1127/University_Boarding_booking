@@ -1,28 +1,29 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Room.css";  
 
 interface Room {
-  room_id : number;
+  room_id: number;
   board_id: number;
-  user_id : number;
-  start_date : string;
-  end_date : string;
-  booking_id : number;
+  user_id?: number;
+  start_date: string;
+  end_date: string;
+  booking_id?: number;
 }
 
 const Room: React.FC = () => {
-  const [Rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState<boolean>(false);
-  const [itemToDelete, setItemToDelete] = useState<{ room_id : number } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{ room_id: number } | null>(null);
+  const navigate = useNavigate(); // For navigation
 
   // Get Rooms
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/room/all")
       .then((response) => {
-        // Rooms order
-        const sortedRooms = response.data.sort((a: Room, b: Room) => a.room_id  - b.room_id );
+        const sortedRooms = response.data.sort((a: Room, b: Room) => a.room_id - b.room_id);
         setRooms(sortedRooms);
       })
       .catch((error) => console.error("Error fetching data:", error));
@@ -32,21 +33,20 @@ const Room: React.FC = () => {
   const deleteRoom = async () => {
     if (itemToDelete) {
       try {
-        await axios.delete(`http://localhost:5000/api/roomsdelete/${itemToDelete.room_id }`);
-        setRooms((prevRooms) => prevRooms.filter((Room) => Room.room_id  !== itemToDelete.room_id ));
+        await axios.delete(`http://localhost:5000/api/roomsdelete/${itemToDelete.room_id}`);
+        setRooms((prevRooms) => prevRooms.filter((room) => room.room_id !== itemToDelete.room_id));
         setShowConfirmDelete(false);
         setItemToDelete(null);
         alert("Room deleted successfully");
       } catch (error) {
-        console.error("Error deleting Room:", error);
-        alert("Error deleting Room");
-        setShowConfirmDelete(false);
+        console.error("Error deleting room:", error);
+        alert("Error deleting room");
       }
     }
   };
 
-  const requestDelete = (room_id : number) => {
-    setItemToDelete({ room_id  });
+  const requestDelete = (room_id: number) => {
+    setItemToDelete({ room_id });
     setShowConfirmDelete(true);
   };
 
@@ -57,30 +57,32 @@ const Room: React.FC = () => {
 
   return (
     <div className="content">
-      <h2>Admin Dashboard</h2>
+      <div className="header">
+        <h2>Room List</h2>
+        <button className="add-room-button" onClick={() => navigate("/addroom")}>
+          + Add Room
+        </button>
+      </div>
+
       <table>
         <thead>
           <tr>
-            <th>room_id </th>
-            <th>board_id</th>
-            <th>user_id</th>
-            <th>start_date</th>
-            <th>end_date</th>
-            <th>booking_id</th>
+            <th>Room ID</th>
+            <th>Board ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {Rooms.map((Room) => (
-            <tr key={Room.room_id }>
-              <td>{Room.room_id }</td>
-              <td>{Room.board_id}</td>
-              <td>{Room.user_id}</td>
-              <td>{Room.start_date}</td>
-              <td>{Room.end_date}</td>
-            
+          {rooms.map((room) => (
+            <tr key={room.room_id}>
+              <td>{room.room_id}</td>
+              <td>{room.board_id}</td>
+              <td>{room.start_date}</td>
+              <td>{room.end_date}</td>
               <td>
-                <button className="delete-button" onClick={() => requestDelete(Room.room_id )}>
+                <button className="delete-button" onClick={() => requestDelete(room.room_id)}>
                   Delete
                 </button>
               </td>
@@ -89,11 +91,10 @@ const Room: React.FC = () => {
         </tbody>
       </table>
 
-  
       {showConfirmDelete && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Are you sure you want to delete this Room?</h3>
+            <h3>Are you sure you want to delete this room?</h3>
             <div className="modal-actions">
               <button className="modal-button cancel" onClick={handleCancelDelete}>
                 Cancel

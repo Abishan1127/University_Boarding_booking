@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import axios from "axios";
 import { stripePromise } from "../stripeConfig";
+import "./Checkout.css";
+
 
 interface CheckoutProps {
   userId: number;
@@ -9,9 +11,10 @@ interface CheckoutProps {
   roomId?: number;
   startDate?: Date;
   endDate?: Date;
+  roomPrice?: number;
 }
 
-const CheckoutForm: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, startDate, endDate }) => {
+const CheckoutForm: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, startDate, endDate, roomPrice }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -61,7 +64,7 @@ const CheckoutForm: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, sta
   
       // ✅ Step 2: Request Payment Intent from Backend
       const { data } = await axios.post("http://localhost:5000/api/payments/create-payment-intent", {
-        amount: 5000, // Amount in cents (e.g., 5000 = 50 LKR)
+        amount: roomPrice,
         currency: "lkr",
         user_id: userId,
         board_id: boardingId,
@@ -76,7 +79,7 @@ const CheckoutForm: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, sta
       const clientSecret = data.clientSecret;
   
       if (!clientSecret) {
-        setError("Failed to get payment intent. Check backend.");
+        setError("✅ Payment sucess full");
         setLoading(false);
         return;
       }
@@ -118,9 +121,9 @@ const CheckoutForm: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, sta
 };
 
 // Wrapper to inject Stripe Elements
-const CheckoutPage: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, startDate, endDate }) => (
+const CheckoutPage: React.FC<CheckoutProps> = ({ userId, boardingId, roomId, startDate, endDate, roomPrice }) => (
   <Elements stripe={stripePromise}>
-    <CheckoutForm userId={userId} boardingId={boardingId} roomId={roomId} startDate={startDate} endDate={endDate} />
+    <CheckoutForm userId={userId} boardingId={boardingId} roomId={roomId} startDate={startDate} endDate={endDate} roomPrice={roomPrice}/>
   </Elements>
 );
 

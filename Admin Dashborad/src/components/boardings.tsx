@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Boarding.css";
 
@@ -14,15 +15,16 @@ interface Boardings {
 }
 
 const Boardings: React.FC = () => {
-  const [boardings, setboardings] = useState<Boardings[]>([]);
+  const [boardings, setBoardings] = useState<Boardings[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [BoardingsIdToDelete, setBoardingsIdToDelete] = useState<number | null>(null);
+  const [boardingsIdToDelete, setBoardingsIdToDelete] = useState<number | null>(null);
+  const navigate = useNavigate(); // For navigation
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/boarding/get")
       .then((response) => {
-        setboardings(response.data);
+        setBoardings(response.data);
       })
       .catch((error) => console.error("Error fetching boardings:", error));
   }, []);
@@ -33,15 +35,15 @@ const Boardings: React.FC = () => {
   };
 
   const confirmDelete = () => {
-    if (BoardingsIdToDelete !== null) {
+    if (boardingsIdToDelete !== null) {
       axios
-        .delete(`http://localhost:5000/api/boarding/${BoardingsIdToDelete}`)
+        .delete(`http://localhost:5000/api/boarding/${boardingsIdToDelete}`)
         .then(() => {
-          setboardings((prev) => prev.filter((uni) => uni.uni_id !== BoardingsIdToDelete));
+          setBoardings((prev) => prev.filter((board) => board.board_id !== boardingsIdToDelete));
           setShowModal(false);
         })
         .catch((error) => {
-          console.error("Error deleting Boardings:", error);
+          console.error("Error deleting boardings:", error);
           setShowModal(false);
         });
     }
@@ -49,7 +51,13 @@ const Boardings: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>Boardings List</h2>
+      <div className="header">
+        <h2>Boardings List</h2>
+        <button className="add-boarding-button" onClick={() => navigate("/addboarding")}>
+          + Add Boarding
+        </button>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -67,7 +75,7 @@ const Boardings: React.FC = () => {
               <td>{board.board_id}</td>
               <td>{board.board_name}</td>
               <td>{board.board_Address}</td>
-              <td>{board.board_contact_number}</td>
+              <td>{board.board_contactnumber}</td>
               <td>
                 <button className="delete-button" onClick={() => handleDelete(board.board_id)}>Delete</button>
               </td>
@@ -80,7 +88,7 @@ const Boardings: React.FC = () => {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Are you sure you want to delete this Boardings?</h3>
+            <h3>Are you sure you want to delete this boarding?</h3>
             <div className="modal-actions">
               <button className="modal-button cancel" onClick={() => setShowModal(false)}>Cancel</button>
               <button className="modal-button confirm" onClick={confirmDelete}>Confirm</button>

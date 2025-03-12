@@ -1,77 +1,59 @@
-const express = require("express");
+// controllers/bookingController.js
+
 const db = require("../config/db");
 
-const router = express.Router();
+// Get all bookings
+const getBookings = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM booking ORDER BY booking_id ASC");
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: "Error fetching bookings", error });
+  }
+};
 
 // Create a new booking
-router.post("/", async (req, res) => {
-  const { user_id, board_id, room_id, start_date, end_date, amount, payment_status } = req.body;
+const createBooking = async (req, res) => {
+  const { bookId, userId, boardId, roomId, startDate, endDate, status, method, transactionId, amount } = req.body;
 
-  if (!user_id || !board_id || !room_id || !start_date || !end_date || !amount) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!bookId || !userId || !boardId || !roomId || !startDate || !endDate || !status || !method || !transactionId || !amount) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
     const [result] = await db.query(
-      "INSERT INTO booking (user_id, board_id, room_id, start_date, end_date, amount, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [user_id, board_id, room_id, start_date, end_date, amount, payment_status]
+      "INSERT INTO booking (bookId, userId, boardId, roomId, startDate, endDate, status, method, transactionId, amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [bookId, userId, boardId, roomId, startDate, endDate, status, method, transactionId, amount]
     );
 
-    res.status(201).json({ message: "Booking created", bookingId: result.insertId });
+    res.status(201).json({ message: "Booking created successfully", bookingId: result.insertId });
   } catch (error) {
     console.error("Error creating booking:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Error creating booking", error });
   }
-});
+};
 
-// Get all bookings
-router.get("/", async (req, res) => {
-  try {
-    const [bookings] = await db.query("SELECT * FROM booking");
-    res.status(200).json(bookings);
-  } catch (error) {
-    console.error("Error fetching bookings:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// Get booking by ID
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [booking] = await db.query("SELECT * FROM booking WHERE booking_id = ?", [id]);
-    res.status(200).json(booking);
-  } catch (error) {
-    console.error("Error fetching booking:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// Update booking payment status
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { payment_status } = req.body;
-
-  try {
-    await db.query("UPDATE booking SET payment_status = ? WHERE booking_id = ?", [payment_status, id]);
-    res.status(200).json({ message: "Booking updated" });
-  } catch (error) {
-    console.error("Error updating booking:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// Delete booking
-router.delete("/:id", async (req, res) => {
+// Delete a booking
+const deleteBooking = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await db.query("DELETE FROM booking WHERE booking_id = ?", [id]);
-    res.status(200).json({ message: "Booking deleted" });
+    const [result] = await db.query("DELETE FROM booking WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({ message: "Booking deleted successfully" });
   } catch (error) {
     console.error("Error deleting booking:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Error deleting booking", error });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  getBookings,
+  createBooking,
+  deleteBooking,
+};

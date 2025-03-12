@@ -75,3 +75,32 @@ th, td {
   background: red;
   color: white;
 }
+/* Container */
+/* .container {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+} */
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add University Button */
+.add-university-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-right: 200px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.add-university-button:hover {
+  background-color: #218838;
+}

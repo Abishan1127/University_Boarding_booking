@@ -4,7 +4,12 @@ import axios from "axios";
 import "./Login.css";
 import imlogin from "../../assets/login-banner.jpeg"
 
-const Login: React.FC = () => {
+interface LoginProps {
+  setAuthenticated: (value: boolean) => void;
+}
+
+
+const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,14 +32,24 @@ const Login: React.FC = () => {
             withCredentials: true, // ✅ Include Cookies
         });
 
-        if (response.status === 200) {
-            alert("Login successful!");
+        console.log("✅ Login Response:", response.data);
+
+        if (response.data.success) {
+            // ✅ Store Token in Local Storage
+            localStorage.setItem("authToken", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            setAuthenticated(true);
+            alert("✅ Login successful!");
             navigate("/");
+
+            // ✅ Update UI state
+            setIsLoggedIn(true);
         } else {
-            setError("Invalid email or password.");
+            setError("❌ Invalid email or password.");
         }
-    } catch (err) {
-        setError("Login failed. Please try again.");
+    } catch (err: any) {
+        console.error("❌ Login Error:", err.response?.data);
+        setError(err.response?.data?.message || "Login failed. Please try again.");
     }
 };
 
@@ -78,3 +93,7 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+function setIsLoggedIn(_arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+
