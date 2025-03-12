@@ -1,0 +1,26 @@
+/* AdPopup.css */
+.ad-container {
+    position: fixed;
+    top: 80px;
+    right: 10px;
+    width: 650px;
+    height: 400px;
+    background: rgb(243, 233, 233);
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.ad-container img {
+    width: 100%;
+    height: 100%;
+}
+
+.close-btn {
+    display: block;
+    text-align: right;
+    cursor: pointer;
+    color: red;
+    font-size: 25px;
+    font-weight: bold;
+}
